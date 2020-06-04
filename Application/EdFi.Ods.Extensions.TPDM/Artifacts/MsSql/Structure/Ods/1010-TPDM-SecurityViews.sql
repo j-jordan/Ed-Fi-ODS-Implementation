@@ -63,13 +63,83 @@ GO
 CREATE VIEW [auth].[EducationOrganizationIdToUniversityId]
 AS
     SELECT UniversityId
-         ,UniversityId AS EducationOrganizationId
+          ,UniversityId AS EducationOrganizationId
     FROM tpdm.University
 GO
 
 CREATE VIEW [auth].[EducationOrganizationIdToTeacherPreparationProviderId]
 AS
     SELECT TeacherPreparationProviderId
-         ,TeacherPreparationProviderId AS EducationOrganizationId
+          ,TeacherPreparationProviderId AS EducationOrganizationId
     FROM tpdm.TeacherPreparationProvider
 GO
+
+CREATE VIEW [auth].[StaffUSIToTeacherPreparationProviderId]
+AS
+    SELECT emp.EducationOrganizationId AS TeacherPreparationProviderId
+          ,emp.StaffUSI
+    FROM tpdm.TeacherPreparationProvider tpp
+        INNER JOIN auth.EducationOrganizationToStaffUSI_Employment emp ON
+        tpp.TeacherPreparationProviderId = emp.EducationOrganizationId
+
+    UNION ALL
+
+    SELECT assgn.EducationOrganizationId AS TeacherPreparationProviderId
+          ,assgn.StaffUSI
+    FROM tpdm.TeacherPreparationProvider tpp
+             INNER JOIN auth.EducationOrganizationToStaffUSI_Assignment assgn ON
+        tpp.TeacherPreparationProviderId = assgn.EducationOrganizationId
+GO
+
+CREATE VIEW [auth].[StaffUSIToUniversityId]
+AS
+    SELECT emp.EducationOrganizationId AS UniversityId
+          ,emp.StaffUSI
+    FROM tpdm.University u
+        INNER JOIN auth.EducationOrganizationToStaffUSI_Employment emp ON
+        u.UniversityId = emp.EducationOrganizationId
+
+    UNION ALL
+
+    SELECT assgn.EducationOrganizationId AS UniversityId
+          ,assgn.StaffUSI
+    FROM tpdm.University u
+             INNER JOIN auth.EducationOrganizationToStaffUSI_Assignment assgn ON
+        u.UniversityId = assgn.EducationOrganizationId
+GO
+
+-- TODO: Move to core when done testing TPDM
+CREATE VIEW [auth].[CommunityProviderIdToStaffUSI]
+AS
+    SELECT emp.EducationOrganizationId AS CommunityProviderId
+          ,emp.StaffUSI
+    FROM edfi.CommunityProvider cp
+        INNER JOIN auth.EducationOrganizationToStaffUSI_Employment emp ON
+        cp.CommunityProviderId = emp.EducationOrganizationId
+
+    UNION ALL
+
+    SELECT assgn.EducationOrganizationId AS CommunityProviderId
+          ,assgn.StaffUSI
+    FROM edfi.CommunityProvider cp
+             INNER JOIN auth.EducationOrganizationToStaffUSI_Assignment assgn ON
+        cp.CommunityProviderId = assgn.EducationOrganizationId
+GO
+
+CREATE VIEW [auth].[PostSecondaryInstitutionIdToStaffUSI]
+AS
+    SELECT emp.EducationOrganizationId AS PostSecondaryInstitutionId
+          ,emp.StaffUSI
+    FROM edfi.PostSecondaryInstitution psi
+        INNER JOIN auth.EducationOrganizationToStaffUSI_Employment emp ON
+        psi.PostSecondaryInstitutionId = emp.EducationOrganizationId
+
+    UNION ALL
+
+    SELECT assgn.EducationOrganizationId AS PostSecondaryInstitutionId
+          ,assgn.StaffUSI
+    FROM edfi.PostSecondaryInstitution psi
+             INNER JOIN auth.EducationOrganizationToStaffUSI_Assignment assgn ON
+        psi.PostSecondaryInstitutionId = assgn.EducationOrganizationId
+GO
+
